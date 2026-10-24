@@ -380,6 +380,86 @@ bool SynthBase::loadFromFile(File preset, std::string& error) {
   return true;
 }
 
+void SynthBase::renderNotesToBuffer(AudioSampleBuffer& buffer, int sample_rate, float note_seconds, float bpm,
+                                    const std::vector<int>& notes, float velocity) {
+  std::vector<RenderNote> sequence;
+  for (int note : notes)
+    sequence.push_back({ 0.0, note_seconds, note, velocity });
+  renderSequenceToBuffer(buffer, sample_rate, bpm, sequence);
+}
+
+void SynthBase::renderSequenceToBuffer(AudioSampleBuffer& buffer, int sample_rate, float bpm,
+                                       const std::vector<RenderNote>& notes) {
+  static constexpr int kBufferSize = 64;
+  static constexpr float kPreProcessSeconds = 0.05f;
+
+  ScopedLock lock(getCriticalSection());
+
+  processModulationChanges();
+  engine_->setSampleRate(sample_rate);
+  engine_->setBpm(bpm);
+  engine_->updateAllModulationSwitches();
+  engine_->allSoundsOff();
+
+  double sample_time = 1.0 / sample_rate;
+  int pre_process_samples = kPreProcessSeconds * sample_rate;
+  double current_time = -pre_process_samples * sample_time;
+  for (int samples = 0; samples < pre_process_samples; samples += kBufferSize) {
+    engine_->correctToTime(current_time);
+    current_time += kBufferSize * sample_time;
+    engine_->process(kBufferSize);
+  }
+
+  struct Event {
+    int sample;
+    bool on;
+    int note;
+    float velocity;
+  };
+  std::vector<Event> events;
+  for (const RenderNote& note : notes) {
+    int start = std::max(0, (int)(note.start_seconds * sample_rate));
+    int end = std::max(start + 1, (int)((note.start_seconds + note.length_seconds) * sample_rate));
+    events.push_back({ start, true, note.note, note.velocity });
+    events.push_back({ end, false, note.note, 0.5f });
+  }
+  // Note-offs sort before note-ons at the same time so repeated notes retrigger.
+  std::stable_sort(events.begin(), events.end(), [](const Event& a, const Event& b) {
+    if (a.sample != b.sample)
+      return a.sample < b.sample;
+    return !a.on && b.on;
+  });
+
+  int total_samples = buffer.getNumSamples();
+  const vital::mono_float* engine_output = (const vital::mono_float*)engine_->output(0)->buffer;
+  float* left = buffer.getWritePointer(0);
+  float* right = buffer.getWritePointer(buffer.getNumChannels() > 1 ? 1 : 0);
+  size_t next_event = 0;
+
+  for (int samples = 0; samples < total_samples; samples += kBufferSize) {
+    int num = std::min(kBufferSize, total_samples - samples);
+    while (next_event < events.size() && events[next_event].sample < samples + num) {
+      const Event& event = events[next_event++];
+      int offset = std::max(0, event.sample - samples);
+      if (event.on)
+        engine_->noteOn(event.note, event.velocity, offset, 0);
+      else
+        engine_->noteOff(event.note, event.velocity, offset, 0);
+    }
+
+    engine_->correctToTime(current_time);
+    current_time += num * sample_time;
+    engine_->process(num);
+
+    for (int i = 0; i < num; ++i) {
+      left[samples + i] = engine_output[vital::poly_float::kSize * i];
+      right[samples + i] = engine_output[vital::poly_float::kSize * i + 1];
+    }
+  }
+
+  engine_->allSoundsOff();
+}
+
 void SynthBase::renderAudioToFile(File file, float seconds, float bpm, std::vector<int> notes, bool render_images) {
   static constexpr int kSampleRate = 44100;
   static constexpr int kPreProcessSamples = 44100;

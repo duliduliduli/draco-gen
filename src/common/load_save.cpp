@@ -197,7 +197,7 @@ void LoadSave::loadModulations(SynthBase* synth, const json& modulations) {
 
 void LoadSave::loadSample(SynthBase* synth, const json& json_sample) {
   vital::Sample* sample = synth->getSample();
-  if (sample)
+  if (sample && json_sample.is_object() && json_sample.count("samples"))
     sample->jsonToState(json_sample);
 }
 

@@ -1,0 +1,167 @@
+{
+  "format": "draco-generator-config",
+  "version": 1,
+  "type": "Bass",
+  "genre": "Tearout",
+  "preset_style": "Bass",
+  "description": "Mono, low octave, heavy wavefold / FM / sync warps, fast tempo-synced LFOs on the filter and wavetable position. Clean sub on its own oscillator.",
+  "tags": ["mono", "aggressive"],
+  "loudness": { "target_rms_db": -13.0 },
+  "base": {
+    "voice": {
+      "polyphony": 1,
+      "legato": [0, 1],
+      "glide_chance": 0.5,
+      "glide_s": [0.01, 0.06],
+      "pitch_bend_range": 12,
+      "velocity_track": [0.0, 0.2],
+      "volume_db": -6.0,
+      "oversampling": 1
+    },
+    "oscillators": {
+      "1": {
+        "wavetables": ["fm_growl", "fold_sine", "vowel_growl", "harsh_digital", "sync_screech"],
+        "level": [0.75, 0.9],
+        "transpose": -12,
+        "unison_voices": [1, 3],
+        "unison_detune_percent": [4, 16],
+        "unison_blend": [0.5, 0.8],
+        "stereo_spread": [0.3, 0.8],
+        "wave_frame": [0, 90],
+        "random_phase": 0.0,
+        "phase": 0.25,
+        "distortion": ["Bend", "Squeeze", "Sync", "Formant", "Quantize", "FM B"],
+        "distortion_amount": [0.4, 0.85],
+        "spectral_morph": ["None", "Harmonic Stretch", "Formant Scale", "Smear", "Inharmonic Stretch"],
+        "spectral_morph_amount": [0.2, 0.7],
+        "destination": "Filter 1"
+      },
+      "2": {
+        "chance": 0.6,
+        "wavetables": ["fold_sine", "fm_growl", "stack_saw"],
+        "level": [0.4, 0.62],
+        "transpose": [-12, 0],
+        "unison_voices": [1, 4],
+        "unison_detune_percent": [8, 28],
+        "wave_frame": [0, 160],
+        "random_phase": 0.0,
+        "distortion": ["Squeeze", "Bend", "None"],
+        "distortion_amount": [0.3, 0.7],
+        "destination": "Filter 1"
+      },
+      "3": {
+        "chance": 0.85,
+        "wavetables": ["sub_sine"],
+        "level": [0.5, 0.65],
+        "transpose": -24,
+        "unison_voices": 1,
+        "random_phase": 0.0,
+        "phase": 0.25,
+        "distortion": "None",
+        "spectral_morph": "None",
+        "destination": "Direct Out"
+      }
+    },
+    "filters": {
+      "1": {
+        "model": ["Dirty", "Ladder", "Diode", "Analog", "Formant", "Comb"],
+        "style": ["12dB", "24dB"],
+        "cutoff_hz": [350, 1800],
+        "resonance": [0.2, 0.6],
+        "drive_db": [4, 14],
+        "blend": [0.0, 0.3],
+        "keytrack": [0.2, 0.6]
+      }
+    },
+    "envelopes": {
+      "1": { "attack_s": [0.0005, 0.003], "decay_s": [0.4, 1.2], "sustain": [0.85, 1.0], "release_s": [0.04, 0.15] },
+      "2": { "attack_s": 0.001, "decay_s": [0.1, 0.4], "sustain": [0.0, 0.3], "release_s": 0.1 }
+    },
+    "lfos": {
+      "1": {
+        "shape": ["wobble", "saw_down", "yoi", "chop", "stepped", "square", "sine"],
+        "tempo": ["1/8", "1/16", "1/8T", "1/16T", "1/4T"],
+        "sync_type": "Trigger"
+      },
+      "2": {
+        "chance": 0.8,
+        "shape": ["triangle", "saw_up", "stepped", "sine"],
+        "tempo": ["1/4", "1/8", "1/8T", "1/2"],
+        "sync_type": "Trigger"
+      }
+    },
+    "modulations": {
+      "lfo1_cutoff": { "source": "lfo_1", "destination": "filter_1_cutoff", "amount": [0.12, 0.35] },
+      "lfo1_frame": { "source": "lfo_1", "destination": "osc_1_wave_frame", "amount": [0.25, 0.7] },
+      "lfo1_osc2_frame": { "chance": 0.7, "source": "lfo_1", "destination": "osc_2_wave_frame", "amount": [0.2, 0.6] },
+      "lfo2_warp": { "chance": 0.7, "source": "lfo_2", "destination": "osc_1_distortion_amount", "amount": [0.1, 0.35] },
+      "lfo2_morph": { "chance": 0.5, "source": "lfo_2", "destination": "osc_1_spectral_morph_amount", "amount": [0.1, 0.4] },
+      "env2_cutoff": { "chance": 0.5, "source": "env_2", "destination": "filter_1_cutoff", "amount": [0.05, 0.2] },
+      "velocity_cutoff": { "chance": 0.4, "source": "velocity", "destination": "filter_1_cutoff", "amount": [0.05, 0.15] },
+      "macro1_frame": { "source": "macro_control_1", "destination": "osc_1_wave_frame", "amount": [0.3, 0.6] },
+      "macro2_cutoff": { "source": "macro_control_2", "destination": "filter_1_cutoff", "amount": [0.2, 0.4] },
+      "macro3_warp": { "source": "macro_control_3", "destination": "osc_1_distortion_amount", "amount": [0.2, 0.5] },
+      "macro4_resonance": { "source": "macro_control_4", "destination": "filter_1_resonance", "amount": [0.2, 0.4] }
+    },
+    "macros": {
+      "1": { "name": "GROWL" },
+      "2": { "name": "CUTOFF" },
+      "3": { "name": "WARP" },
+      "4": { "name": "RESONANCE" }
+    }
+  },
+  "variants": [
+    {
+      "name": "Growl",
+      "weight": 3,
+      "tags": ["growl"],
+      "oscillators": {
+        "1": {
+          "wavetables": ["fm_growl", "vowel_growl"],
+          "distortion": ["Bend", "Squeeze", "FM B", "Formant"]
+        }
+      },
+      "filters": { "1": { "model": ["Formant", "Dirty", "Comb", "Ladder"] } }
+    },
+    {
+      "name": "Fold",
+      "weight": 2,
+      "tags": ["wavefold"],
+      "oscillators": {
+        "1": {
+          "wavetables": ["fold_sine"],
+          "wave_frame": [40, 140],
+          "distortion": ["Squeeze", "Bend"],
+          "spectral_morph": ["Harmonic Stretch", "None"]
+        }
+      },
+      "filters": { "1": { "model": ["Dirty", "Diode", "Ladder"], "cutoff_hz": [500, 2500] } }
+    },
+    {
+      "name": "Screech",
+      "weight": 2,
+      "tags": ["screech"],
+      "oscillators": {
+        "1": {
+          "wavetables": ["sync_screech", "harsh_digital"],
+          "distortion": ["Sync", "Formant", "Quantize"]
+        }
+      },
+      "filters": { "1": { "model": ["Comb", "Diode", "Formant"], "cutoff_hz": [600, 2600] } },
+      "lfos": { "1": { "tempo": ["1/16", "1/16T", "1/32"] } }
+    },
+    {
+      "name": "Metal",
+      "weight": 1,
+      "tags": ["metallic"],
+      "oscillators": {
+        "1": {
+          "wavetables": ["harsh_digital", "fm_growl"],
+          "spectral_morph": ["Inharmonic Stretch", "Random Amplitudes", "Phase Disperse"],
+          "spectral_morph_amount": [0.3, 0.8]
+        }
+      },
+      "filters": { "1": { "model": ["Comb", "Phaser", "Dirty"] } }
+    }
+  ]
+}
