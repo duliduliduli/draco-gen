@@ -23,6 +23,7 @@
 #include "patch_history.h"
 
 #include <iomanip>
+#include <sstream>
 
 String getArgumentValue(int argc, const char* argv[], const String& flag, const String& full_flag) {
   for (int i = 0; i < argc - 1; ++i) {
