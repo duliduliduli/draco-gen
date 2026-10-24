@@ -16,6 +16,7 @@
 
 #include "full_interface.h"
 
+#include "generator_section.h"
 #include "about_section.h"
 #include "bank_exporter.h"
 #include "bend_section.h"
@@ -86,6 +87,9 @@ FullInterface::FullInterface(SynthGuiData* synth_data) : SynthSection("full_inte
 
   header_ = std::make_unique<HeaderSection>();
   addSubSection(header_.get());
+
+  generator_section_ = std::make_unique<GeneratorSection>("generator");
+  addSubSection(generator_section_.get());
   header_->addListener(this);
 
   modulation_interface_ = std::make_unique<ModulationInterface>(synth_data);
@@ -432,10 +436,11 @@ void FullInterface::resized() {
   int extra_mod_width = findValue(Skin::kModulationButtonWidth);
   int main_x = left + extra_mod_width + 2 * voice_padding;
   int top_height = kTopHeight * ratio;
+  int generator_height = GeneratorSection::kDefaultHeight * ratio;
 
   int knob_section_height = getKnobSectionHeight();
   int keyboard_section_height = knob_section_height * 0.7f;
-  int voice_height = height - top_height - keyboard_section_height;
+  int voice_height = height - top_height - generator_height - keyboard_section_height;
 
   int section_one_width = 350 * ratio;
   int section_two_width = section_one_width;
@@ -444,7 +449,9 @@ void FullInterface::resized() {
 
   header_->setTabOffset(extra_mod_width + 2 * voice_padding);
   header_->setBounds(left, top, width, top_height);
-  Rectangle<int> main_bounds(main_x, top + top_height, audio_width, voice_height);
+  generator_section_->setBounds(left + voice_padding, top + top_height,
+                                width - 2 * voice_padding, generator_height - padding);
+  Rectangle<int> main_bounds(main_x, top + top_height + generator_height, audio_width, voice_height);
 
   if (synthesis_interface_)
     synthesis_interface_->setBounds(main_bounds);
@@ -467,8 +474,9 @@ void FullInterface::resized() {
   bend_section_->setBounds(left + voice_padding, top + height - knob_section_height - padding,
                            extra_mod_width, knob_section_height);
 
-  int extra_mod_height = height - top_height - knob_section_height - padding - 1;
-  extra_mod_section_->setBounds(left + voice_padding, top + top_height, extra_mod_width, extra_mod_height);
+  int extra_mod_height = height - top_height - generator_height - knob_section_height - padding - 1;
+  extra_mod_section_->setBounds(left + voice_padding, top + top_height + generator_height,
+                                extra_mod_width, extra_mod_height);
 
   int keyboard_height = keyboard_section_height - voice_padding - padding;
   int keyboard_x = extra_mod_section_->getRight() + voice_padding;

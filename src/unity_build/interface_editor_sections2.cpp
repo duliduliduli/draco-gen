@@ -38,3 +38,4 @@
 #include "lfo_section.cpp"
 #include "random_section.cpp"
 #include "save_section.cpp"
+#include "generator_section.cpp"

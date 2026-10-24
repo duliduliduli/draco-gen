@@ -20,11 +20,34 @@ libxcursor-dev libxext-dev libgl1-mesa-dev libcurl4-openssl-dev libgtk-3-dev`.
 Outputs land in `build/DracoGen_artefacts/Release/{VST3,AU,Standalone}` and the
 headless tool in `build/draco_render_artefacts/Release/draco_render`.
 
-### Headless renderer
+## Patch generator
+
+The **Generator** strip under the header picks a **Type** (Lead, Bass, ...) and
+**Genre** (Hybrid Trap, Tearout, ...):
+
+- **Generate** builds a new patch from the rule set for that type and genre
+  (`resources/generator/*.json`, format in `resources/generator/README.md`),
+  checks it is playable and sets its loudness.
+- **<** / **>** walk through the patches generated this session; **>** on the
+  newest patch generates another one.
+- **Save** writes what is playing (including your tweaks) to
+  `<user presets>/Draco Generated/<Type>/<Genre>/<Name>.draco`, tagged with
+  type, genre, variant and seed.
+
+v1 ships Lead and Bass for Hybrid Trap and Tearout. The output always passes
+through a -1 dBFS safety limiter.
+
+### Headless tool
 
 ```sh
-draco_render preset.draco -o out.wav -m C1,C3,C5 -l 3   # render a preset
+draco_render preset.draco -o out.wav -m C1,C3,C5 -l 3      # render a preset
+draco_render --list                                        # generator configs
+draco_render --generate --type Bass --genre Tearout --count 10 --seed 1 --out-dir out --wav
+draco_render --audit --count 40                            # check every config
+tools/demo/generate_demo.sh build/.../draco_render demo 10 # demo set + mp3s
 ```
+
+`ctest --test-dir build` runs the generator unit tests and a short audit.
 
 ## CI
 

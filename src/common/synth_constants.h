@@ -40,7 +40,7 @@ namespace vital {
   constexpr int kOscilloscopeMemoryResolution = 512;
   constexpr int kAudioMemorySamples = 1 << 15;
   constexpr int kDefaultWindowWidth = 1400;
-  constexpr int kDefaultWindowHeight = 820;
+  constexpr int kDefaultWindowHeight = 860;
   constexpr int kMinWindowWidth = 350;
   constexpr int kMinWindowHeight = 205;
 
