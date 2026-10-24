@@ -74,8 +74,10 @@ namespace vital {
 
     Value* effect_chain_order = createBaseControl("effect_chain_order");
     effect_chain_ = new ReorderableEffectChain(beats_per_second, voice_handler_->midi_offset_output());
+    // Draco Gen v1 has no effects section. The chain is kept as a submodule so
+    // its parameters still exist (presets keep loading), but it is never
+    // processed and the voices go straight to the output.
     addSubmodule(effect_chain_);
-    addProcessor(effect_chain_);
     effect_chain_->plug(voice_handler_, ReorderableEffectChain::kAudio);
     effect_chain_->plug(effect_chain_order, ReorderableEffectChain::kOrder);
 
@@ -98,7 +100,7 @@ namespace vital {
     createStatusOutput("flanger_delay_frequency", flanger->output(FlangerModule::kFrequencyOutput));
 
     output_total_ = new Add();
-    output_total_->plug(effect_chain_, 0);
+    output_total_->plug(voice_handler_, 0);
     output_total_->plug(voice_handler_->getDirectOutput(), 1);
     addProcessor(output_total_);
 
@@ -260,12 +262,10 @@ namespace vital {
 
   void SoundEngine::correctToTime(double seconds) {
     voice_handler_->correctToTime(seconds);
-    effect_chain_->correctToTime(seconds);
   }
 
   void SoundEngine::allSoundsOff() {
     voice_handler_->allSoundsOff();
-    effect_chain_->hardReset();
     decimator_->hardReset();
   }
 

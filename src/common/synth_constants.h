@@ -71,6 +71,19 @@ namespace vital {
   const std::string kBankExtension = "dracobank";
   const std::string kBankExtensionsList = "*." + kBankExtension + ";*.vitalbank";
 
+  // Draco Gen v1 has no effects section. Effect parameters still exist so presets
+  // load unchanged, but they are not processed, shown, automatable or modulatable.
+  inline bool isEffectParameter(const std::string& name) {
+    static const std::string kEffectPrefixes[] = {
+      "chorus_", "compressor_", "delay_", "distortion_", "phaser_", "flanger_", "reverb_", "eq_", "filter_fx_"
+    };
+    for (const std::string& prefix : kEffectPrefixes) {
+      if (name.compare(0, prefix.length(), prefix) == 0)
+        return true;
+    }
+    return name == "effect_chain_order";
+  }
+
   inline bool isWavetableFileExtension(const std::string& extension) {
     return extension == "." + kWavetableExtension || extension == "." + kLegacyWavetableExtension;
   }
