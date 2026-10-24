@@ -21,6 +21,7 @@ endif()
 option(DRACO_BUILD_PLUGIN "Build the VST3/AU/Standalone plugin" ON)
 option(DRACO_BUILD_RENDER "Build the headless draco_render command line tool" ON)
 option(DRACO_BUILD_TESTS "Build the generator unit tests" ON)
+option(DRACO_BUILD_PLUGIN_SMOKE "Build the plugin host smoke test" ON)
 
 enable_testing()
 
@@ -251,3 +252,30 @@ if(DRACO_BUILD_TESTS)
     add_test(NAME generator_audit COMMAND draco_render --audit --count 8)
   endif()
 endif()
+
+# ------------------------------------------------------------------------------
+# Plugin host smoke test: loads the built VST3 and plays a note.
+# ------------------------------------------------------------------------------
+if(DRACO_BUILD_PLUGIN_SMOKE AND DRACO_BUILD_PLUGIN)
+  juce_add_console_app(draco_plugin_smoke
+    PRODUCT_NAME "draco_plugin_smoke"
+    COMPANY_NAME "${DRACO_COMPANY_NAME}")
+  target_sources(draco_plugin_smoke PRIVATE tools/plugin_smoke/main.cpp)
+  juce_generate_juce_header(draco_plugin_smoke)
+  target_compile_definitions(draco_plugin_smoke PRIVATE
+    JUCE_PLUGINHOST_VST3=1
+    JUCE_PLUGINHOST_AU=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0)
+  target_link_libraries(draco_plugin_smoke
+    PRIVATE
+      juce::juce_audio_processors
+      juce::juce_audio_utils
+    PUBLIC
+      juce::juce_recommended_config_flags)
+  add_dependencies(draco_plugin_smoke DracoGen_VST3)
+
+  add_test(NAME vst3_smoke
+    COMMAND draco_plugin_smoke "${CMAKE_CURRENT_BINARY_DIR}/DracoGen_artefacts/$<CONFIG>/VST3/${DRACO_PRODUCT_NAME}.vst3")
+endif()
+
