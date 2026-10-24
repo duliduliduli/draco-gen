@@ -98,10 +98,8 @@ void doRenderToFile(HeadlessSynth& headless_synth, int argc, const char* argv[])
   if (string_output_file.isEmpty())
     return;
   
-  if (!string_output_file.startsWith("/"))
-    string_output_file = "./" + string_output_file;
-  
-  File output_file(string_output_file);
+  File output_file = File::getCurrentWorkingDirectory().getChildFile(string_output_file);
+  output_file.getParentDirectory().createDirectory();
   if (!output_file.hasWriteAccess()) {
     std::cout << "Error: Don't have permission to write output file." << newLine;
     return;

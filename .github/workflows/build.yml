@@ -1,0 +1,185 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  linux:
+    name: Linux (smoke test + demo render)
+    # Only runs for pushes (PRs from this repo already get the push run).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libasound2-dev libfreetype-dev libx11-dev \
+            libxrandr-dev libxinerama-dev libxcursor-dev libxext-dev libgl1-mesa-dev \
+            libcurl4-openssl-dev libjack-jackd2-dev libgtk-3-dev
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Smoke test renderer
+        run: |
+          mkdir -p out
+          build/draco_render_artefacts/$BUILD_TYPE/draco_render -o out/init.wav -m C3 -l 2
+          test -s out/init.wav
+
+      - name: Generate demo patches
+        if: hashFiles('tools/demo/generate_demo.sh') != ''
+        run: bash tools/demo/generate_demo.sh build/draco_render_artefacts/$BUILD_TYPE/draco_render out/demo
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          cp -r "build/DracoGen_artefacts/$BUILD_TYPE/VST3/Draco Gen.vst3" dist/
+          cp "build/DracoGen_artefacts/$BUILD_TYPE/Standalone/Draco Gen" dist/
+          cp build/draco_render_artefacts/$BUILD_TYPE/draco_render dist/
+          cp LICENSE NOTICE.md dist/ 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DracoGen-linux-x64
+          path: dist
+
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('out/demo/**') != ''
+        with:
+          name: DracoGen-demo-patches
+          path: out/demo
+
+  macos:
+    name: macOS (universal)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: macos-14
+    env:
+      MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+      NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+      NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+      NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Install Ninja
+        run: brew install ninja
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Check universal binaries
+        run: |
+          lipo -info "build/DracoGen_artefacts/$BUILD_TYPE/VST3/Draco Gen.vst3/Contents/MacOS/Draco Gen"
+          lipo -info "build/DracoGen_artefacts/$BUILD_TYPE/AU/Draco Gen.component/Contents/MacOS/Draco Gen"
+
+      - name: Smoke test renderer
+        run: |
+          mkdir -p out
+          build/draco_render_artefacts/$BUILD_TYPE/draco_render -o out/init.wav -m C3 -l 2
+          test -s out/init.wav
+
+      - name: Stage bundles
+        run: |
+          mkdir -p dist
+          cp -R "build/DracoGen_artefacts/$BUILD_TYPE/VST3/Draco Gen.vst3" dist/
+          cp -R "build/DracoGen_artefacts/$BUILD_TYPE/AU/Draco Gen.component" dist/
+          cp -R "build/DracoGen_artefacts/$BUILD_TYPE/Standalone/Draco Gen.app" dist/
+          cp LICENSE dist/
+          cp NOTICE.md dist/ 2>/dev/null || true
+
+      - name: Code sign
+        run: bash tools/ci/macos_sign.sh dist
+
+      - name: Validate AU
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "dist/Draco Gen.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 2
+          auval -a | grep -i "Drco" || true
+          auval -strict -v aumu DrGn Drco
+
+      - name: Notarize
+        if: env.NOTARY_APPLE_ID != ''
+        run: bash tools/ci/macos_notarize.sh dist
+
+      - name: Zip
+        run: |
+          cd dist
+          ditto -c -k --keepParent . ../DracoGen-macos-universal.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DracoGen-macos-universal
+          path: DracoGen-macos-universal.zip
+
+  windows:
+    name: Windows (x64)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build
+        run: cmake --build build --config $env:BUILD_TYPE --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C $env:BUILD_TYPE --output-on-failure
+
+      - name: Smoke test renderer
+        shell: bash
+        run: |
+          mkdir -p out
+          build/draco_render_artefacts/$BUILD_TYPE/draco_render.exe -o out/init.wav -m C3 -l 2
+          test -s out/init.wav
+
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp -r "build/DracoGen_artefacts/$BUILD_TYPE/VST3/Draco Gen.vst3" dist/
+          cp "build/DracoGen_artefacts/$BUILD_TYPE/Standalone/Draco Gen.exe" dist/
+          cp build/draco_render_artefacts/$BUILD_TYPE/draco_render.exe dist/
+          cp LICENSE dist/
+          cp NOTICE.md dist/ 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DracoGen-windows-x64
+          path: dist

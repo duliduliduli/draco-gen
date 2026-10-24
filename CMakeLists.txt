@@ -22,6 +22,8 @@ option(DRACO_BUILD_PLUGIN "Build the VST3/AU/Standalone plugin" ON)
 option(DRACO_BUILD_RENDER "Build the headless draco_render command line tool" ON)
 option(DRACO_BUILD_TESTS "Build the generator unit tests" ON)
 
+enable_testing()
+
 add_subdirectory(third_party/JUCE EXCLUDE_FROM_ALL)
 
 set(DRACO_COMPANY_NAME "Draco Gen")
