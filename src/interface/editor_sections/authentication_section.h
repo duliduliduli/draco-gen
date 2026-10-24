@@ -50,7 +50,7 @@ class ForgotPasswordLink : public PlainTextComponent {
 
 class AuthInitThread : public Thread {
   public:
-    AuthInitThread(AuthenticationSection* ref) : Thread("Vial Auth Init Thread"), ref_(ref) { }
+    AuthInitThread(AuthenticationSection* ref) : Thread("Draco Gen Auth Init Thread"), ref_(ref) { }
     virtual ~AuthInitThread() { }
 
     void run() override;

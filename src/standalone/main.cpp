@@ -193,7 +193,7 @@ class SynthApplication : public JUCEApplication {
           }
           else if (info.commandID == kOpen) {
             File active_file = editor_->getActiveFile();
-            FileChooser open_box("Open Preset", active_file, String("*.") + vital::kPresetExtension);
+            FileChooser open_box("Open Preset", active_file, String(vital::kPresetExtensionsList));
             if (!open_box.browseForFileToOpen())
               return true;
             
@@ -297,7 +297,7 @@ class SynthApplication : public JUCEApplication {
             file = File("./" + arg);
           
           if (arg != "" && arg[0] != '-' && !last_arg_was_option && file.exists()) {
-            if (file.getFileExtension() == String(".") + String(vital::kWavetableExtension)) {
+            if (vital::isWavetableFileExtension(file.getFileExtension().toStdString())) {
               output_file = File::getCurrentWorkingDirectory().getChildFile(file.getFileNameWithoutExtension() + ".wav");
 
               try {
@@ -336,7 +336,7 @@ class SynthApplication : public JUCEApplication {
         std::unique_ptr<FileOutputStream> file_stream = output_file.createOutputStream();
         WavAudioFormat wav_format;
         StringPairArray meta_data;
-        meta_data.set("clm ", "<!>2048 20000000 wavetable (vital.audio)");
+        meta_data.set("clm ", "<!>2048 20000000 wavetable (Draco Gen)");
         std::unique_ptr<AudioFormatWriter> writer(wav_format.createWriterFor(file_stream.get(), kSampleRate,
                                                                              1, 16, meta_data, 0));
 
@@ -371,7 +371,7 @@ class SynthApplication : public JUCEApplication {
           else
             file = File("./" + arg);
           if (arg != "" && arg[0] != '-' && !last_arg_was_option && file.exists()) {
-            if (file.getFileExtension() == String(".") + String(vital::kWavetableExtension)) {
+            if (vital::isWavetableFileExtension(file.getFileExtension().toStdString())) {
               try {
                 json parsed_json_state = json::parse(file.loadFileAsString().toStdString(), nullptr, false);
                 wavetable_creator.jsonToState(parsed_json_state);

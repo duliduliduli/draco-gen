@@ -1293,7 +1293,8 @@ void PopupBrowser::checkNoContent() {
   bool has_content = LoadSave::hasDataDirectory();
   if (search_box_)
     search_box_->setVisible(has_content);
-  download_button_->setVisible(!has_content);
+  // Draco Gen has no content server, so the download button stays hidden.
+  download_button_->setVisible(false);
 }
 
 void PopupBrowser::checkStoreButton() {
@@ -1302,7 +1303,7 @@ void PopupBrowser::checkStoreButton() {
     String type = folder_list_->getPassthroughFolderName();
     store_button_->setText("Get more " + type.toLowerCase().toStdString() + " by " + author);
     String cleaned = String(author).removeCharacters(" _.").toLowerCase();
-    store_button_->setVisible(more_author_presets_.count(cleaned.toStdString()));
+    store_button_->setVisible(false);
   }
 }
 

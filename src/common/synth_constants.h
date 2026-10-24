@@ -49,13 +49,31 @@ namespace vital {
   constexpr wchar_t kDefaultKeyboardOctaveDown = 'z';
   const std::wstring kDefaultKeyboard = L"awsedftgyhujkolp;'";
 
-  const std::string kPresetExtension = "vital";
-  const std::string kWavetableExtension = "vitaltable";
-  const std::string kWavetableExtensionsList = "*." + vital::kWavetableExtension + ";*.wav;*.flac";
+  // Version written into (and compared against) preset, wavetable and skin files.
+  // This tracks the Vital file format rather than the Draco Gen release version
+  // so presets stay interchangeable with Vital 1.x.
+  const std::string kFileFormatVersion = "1.5.5";
+
+  // Draco Gen file types. Files using the original Vital extensions share the
+  // same format, so they are still accepted when loading.
+  const std::string kPresetExtension = "draco";
+  const std::string kLegacyPresetExtension = "vital";
+  const std::string kPresetExtensionsList = "*." + kPresetExtension + ";*." + kLegacyPresetExtension;
+  const std::string kWavetableExtension = "dracotable";
+  const std::string kLegacyWavetableExtension = "vitaltable";
+  const std::string kWavetableExtensionsList = "*." + kWavetableExtension + ";*." + kLegacyWavetableExtension +
+                                               ";*.wav;*.flac";
   const std::string kSampleExtensionsList = "*.wav;*.flac";
-  const std::string kSkinExtension = "vitalskin";
-  const std::string kLfoExtension = "vitallfo";
-  const std::string kBankExtension = "vitalbank";
+  const std::string kSkinExtension = "dracoskin";
+  const std::string kSkinExtensionsList = "*." + kSkinExtension + ";*.vitalskin";
+  const std::string kLfoExtension = "dracolfo";
+  const std::string kLfoExtensionsList = "*." + kLfoExtension + ";*.vitallfo";
+  const std::string kBankExtension = "dracobank";
+  const std::string kBankExtensionsList = "*." + kBankExtension + ";*.vitalbank";
+
+  inline bool isWavetableFileExtension(const std::string& extension) {
+    return extension == "." + kWavetableExtension || extension == "." + kLegacyWavetableExtension;
+  }
 
   namespace constants {
     enum SourceDestination {

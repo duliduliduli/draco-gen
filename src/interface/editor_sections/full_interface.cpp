@@ -301,7 +301,7 @@ void FullInterface::dataDirectoryChanged() {
 }
 
 void FullInterface::noDownloadNeeded() {
-  update_check_section_->startCheck();
+  // Draco Gen does not phone home for updates.
 }
 
 void FullInterface::needsUpdate() {
@@ -310,10 +310,7 @@ void FullInterface::needsUpdate() {
 }
 
 void FullInterface::loggedIn() {
-#if !defined(NO_TEXT_ENTRY)
-  if (needs_download_)
-    download_section_->triggerDownload();
-#endif
+  // Draco Gen has no factory content download.
 }
 
 void FullInterface::repaintChildBackground(SynthSection* child) {
@@ -585,10 +582,7 @@ void FullInterface::setWavetableNames() {
 }
 
 void FullInterface::startDownload() {
-  if (auth_.loggedIn() || authentication_ == nullptr)
-    download_section_->triggerDownload();
-  else
-    authentication_->setVisible(true);
+  // Draco Gen has no factory content download.
 }
 
 void FullInterface::newOpenGLContextCreated() {
@@ -596,7 +590,7 @@ void FullInterface::newOpenGLContextCreated() {
   unsupported_ = version_supported < kMinOpenGlVersion;
   if (unsupported_) {
     NativeMessageBox::showMessageBoxAsync(AlertWindow::WarningIcon, "Unsupported OpenGl Version",
-                                          String("Vial requires OpenGL version: ") + String(kMinOpenGlVersion) +
+                                          String("Draco Gen requires OpenGL version: ") + String(kMinOpenGlVersion) +
                                           String("\nSupported version: ") + String(version_supported));
     return;
   }

@@ -36,7 +36,7 @@ AboutSection::AboutSection(const String& name) : Overlay(name), body_(Shaders::k
   logo_ = std::make_unique<AppLogo>("logo");
   addOpenGlComponent(logo_.get());
 
-  name_text_ = std::make_unique<PlainTextComponent>("plugin name", "VIAL");
+  name_text_ = std::make_unique<PlainTextComponent>("plugin name", "DRACO GEN");
   addOpenGlComponent(name_text_.get());
   name_text_->setFontType(PlainTextComponent::kRegular);
   name_text_->setTextSize(40.0f);
@@ -46,7 +46,9 @@ AboutSection::AboutSection(const String& name) : Overlay(name), body_(Shaders::k
   version_text_->setFontType(PlainTextComponent::kLight);
   version_text_->setTextSize(12.0f);
 
-  check_for_updates_text_ = std::make_unique<PlainTextComponent>("Check for updates", String("Check for updates"));
+  // Draco Gen does not check for updates; this line shows the license credit instead.
+  check_for_updates_text_ = std::make_unique<PlainTextComponent>("license",
+      String("GPL-3.0  -  based on Vital by Matt Tytel"));
   addOpenGlComponent(check_for_updates_text_.get());
   check_for_updates_text_->setFontType(PlainTextComponent::kLight);
   check_for_updates_text_->setTextSize(14.0f);
@@ -55,8 +57,9 @@ AboutSection::AboutSection(const String& name) : Overlay(name), body_(Shaders::k
   check_for_updates_ = std::make_unique<OpenGlToggleButton>("");
   check_for_updates_->setToggleState(LoadSave::shouldCheckForUpdates(), NotificationType::dontSendNotification);
   check_for_updates_->addListener(this);
-  addAndMakeVisible(check_for_updates_.get());
+  addChildComponent(check_for_updates_.get());
   addOpenGlComponent(check_for_updates_->getGlComponent());
+  check_for_updates_->getGlComponent()->setVisible(false);
 
   size_button_extra_small_ = std::make_unique<OpenGlToggleButton>(String(100 * kMultExtraSmall) + "%");
   size_button_extra_small_->setUiButton(false);
@@ -163,9 +166,8 @@ void AboutSection::resized() {
   check_for_updates_->setBounds(info_rect.getX() + padding_x,
                                 info_rect.getY() + padding_y + 145.0f * size_ratio_,
                                 check_updates_height, check_updates_height);
-  int check_for_updates_width = 3 * size_width + 2 * size_padding;
-  check_for_updates_text_->setBounds(check_for_updates_->getRight() + size_padding, check_for_updates_->getY(),
-                                     check_for_updates_width, check_updates_height);
+  check_for_updates_text_->setBounds(info_rect.getX() + padding_x, check_for_updates_->getY(),
+                                     info_rect.getWidth() - 2 * padding_x, check_updates_height);
 
   int size_y = check_for_updates_->getBottom() + padding_y;
 

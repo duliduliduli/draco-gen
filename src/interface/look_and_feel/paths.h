@@ -30,26 +30,18 @@ class Paths {
       return drawable->getOutlineAsPath();
     }
 
-    static Path vitalRing() {
-      Path path = fromSvgData((const void*)BinaryData::vital_ring_svg, BinaryData::vital_ring_svgSize);
+    static Path logoRing() {
+      Path path = fromSvgData((const void*)BinaryData::draco_ring_svg, BinaryData::draco_ring_svgSize);
       path.addLineSegment(Line<float>(0.0f, 0.0f, 0.0f, 0.0f), 0.2f);
       path.addLineSegment(Line<float>(kLogoWidth, kLogoWidth, kLogoWidth, kLogoWidth), 0.2f);
       return path;
     }
 
-    static Path vitalV() {
-      Path path = fromSvgData((const void*)BinaryData::vital_v_svg, BinaryData::vital_ring_svgSize);
+    static Path logoLetter() {
+      Path path = fromSvgData((const void*)BinaryData::draco_letter_svg, BinaryData::draco_letter_svgSize);
       path.addLineSegment(Line<float>(0.0f, 0.0f, 0.0f, 0.0f), 0.2f);
       path.addLineSegment(Line<float>(kLogoWidth, kLogoWidth, kLogoWidth, kLogoWidth), 0.2f);
       return path;
-    }
-
-    static Path vitalWord() {
-      return fromSvgData((const void*)BinaryData::vital_word_svg, BinaryData::vital_word_svgSize);
-    }
-
-    static Path vitalWordRing() {
-      return fromSvgData((const void*)BinaryData::vital_word_ring_svg, BinaryData::vital_word_ring_svgSize);
     }
 
     static Path chorus() {

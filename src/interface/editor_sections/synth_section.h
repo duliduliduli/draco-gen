@@ -112,8 +112,8 @@ class LoadingWheel : public OpenGlQuad {
 class AppLogo : public OpenGlImageComponent {
   public:
     AppLogo(String name) : OpenGlImageComponent(std::move(name)) {
-      logo_letter_ = Paths::vitalV();
-      logo_ring_ = Paths::vitalRing();
+      logo_letter_ = Paths::logoLetter();
+      logo_ring_ = Paths::logoRing();
     }
 
     void paint(Graphics& g) override {

@@ -35,7 +35,7 @@ UpdateCheckSection::UpdateCheckSection(String name) : Overlay(name), version_req
                                                       body_(Shaders::kRoundedRectangleFragment) {
   addOpenGlComponent(&body_);
 
-  notify_text_ = std::make_unique<PlainTextComponent>("notify", "There is a new version of Vital!");
+  notify_text_ = std::make_unique<PlainTextComponent>("notify", "There is a new version of Draco Gen!");
   notify_text_->setTextSize(20.0f);
   notify_text_->setFontType(PlainTextComponent::kLight);
   addOpenGlComponent(notify_text_.get());
@@ -144,7 +144,7 @@ void UpdateCheckSection::finished(URL::DownloadTask* task, bool success) {
 
 void UpdateCheckSection::checkUpdate() {
   URL version_url("");
-  version_file_ = File::getSpecialLocation(File::tempDirectory).getChildFile("vital_versions.txt");
+  version_file_ = File::getSpecialLocation(File::tempDirectory).getChildFile("dracogen_versions.txt");
   download_task_ = version_url.downloadToFile(version_file_, "", this);
 }
 

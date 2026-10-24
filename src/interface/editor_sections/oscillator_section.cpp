@@ -1101,7 +1101,7 @@ void OscillatorSection::loadFile(const File& wavetable_file) {
     return;
 
   current_file_ = wavetable_file;
-  if (wavetable_file.getFileExtension() == String(".") + vital::kWavetableExtension) {
+  if (vital::isWavetableFileExtension(wavetable_file.getFileExtension().toStdString())) {
     wavetable_->setLoadingWavetable(true);
     parent->loadWavetableFile(index_, wavetable_file);
     wavetable_->setLoadingWavetable(false);

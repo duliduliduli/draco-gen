@@ -471,7 +471,7 @@ json WavetableCreator::stateToJson() {
     { "groups", json_groups },
     { "name", wavetable_->getName() },
     { "author", wavetable_->getAuthor() },
-    { "version", ProjectInfo::versionString },
+    { "version", vital::kFileFormatVersion },
     { "remove_all_dc", remove_all_dc_ },
     { "full_normalize", full_normalize_ },
   };

@@ -16,6 +16,11 @@
 
 #include "skin.h"
 #include "default_look_and_feel.h"
+
+namespace {
+  // Skin file format version (Vital 1.0.6), independent of the Draco Gen release version.
+  constexpr int kSkinFormatVersion = 0x10006;
+}
 #include "full_interface.h"
 #include "synth_constants.h"
 #include "synth_section.h"
@@ -349,7 +354,7 @@ json Skin::stateToJson() {
   }
 
   data["overrides"] = overrides;
-  data["synth_version"] = ProjectInfo::versionNumber;
+  data["synth_version"] = kSkinFormatVersion;
 
   return data;
 }
@@ -640,7 +645,7 @@ class SkinColorPicker : public Component, public Button::Listener, public Slider
 
     void buttonClicked(Button* clicked_button) override {
       if (clicked_button == &load_button_) {
-        FileChooser open_box("Open Skin", File(), String("*.") + vital::kSkinExtension);
+        FileChooser open_box("Open Skin", File(), String(vital::kSkinExtensionsList));
         if (open_box.browseForFileToOpen()) {
           if (!skin_->loadFromFile(open_box.getResult())) {
             AlertWindow::showNativeDialogBox("Error opening skin", "Skin file is corrupted and won't load.", false);

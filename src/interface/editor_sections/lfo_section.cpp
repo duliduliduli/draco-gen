@@ -359,7 +359,7 @@ void LfoSection::togglePaintMode(bool enabled, bool temporary_switch) {
 }
 
 void LfoSection::importLfo() {
-  FileChooser import_box("Import LFO", LoadSave::getUserLfoDirectory(), String("*.") + vital::kLfoExtension);
+  FileChooser import_box("Import LFO", LoadSave::getUserLfoDirectory(), String(vital::kLfoExtensionsList));
   if (!import_box.browseForFileToOpen())
     return;
 
@@ -388,7 +388,7 @@ void LfoSection::fileLoaded() {
 }
 
 void LfoSection::prevClicked() {
-  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String("*.") + vital::kLfoExtension,
+  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String(vital::kLfoExtensionsList),
                                            "", getCurrentFile(), -1);
   if (lfo_file.exists())
     loadFile(lfo_file);
@@ -397,7 +397,7 @@ void LfoSection::prevClicked() {
 }
 
 void LfoSection::nextClicked() {
-  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String("*.") + vital::kLfoExtension,
+  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String(vital::kLfoExtensionsList),
                                            "", getCurrentFile(), 1);
   if (lfo_file.exists())
     loadFile(lfo_file);
@@ -414,7 +414,7 @@ void LfoSection::textMouseDown(const MouseEvent& e) {
   Rectangle<int> bounds(preset_selector_->getRight() - browser_width, -browser_height,
                         browser_width, browser_height);
   bounds = getLocalArea(this, bounds);
-  showPopupBrowser(this, bounds, LoadSave::getLfoDirectories(), String("*.") + vital::kLfoExtension,
+  showPopupBrowser(this, bounds, LoadSave::getLfoDirectories(), String(vital::kLfoExtensionsList),
                    LoadSave::kLfoFolderName, "");
 }
 

@@ -1148,7 +1148,7 @@ void ModulationMatrix::destroyOpenGlComponents(OpenGlWrapper& open_gl) {
 }
 
 void ModulationMatrix::prevClicked() {
-  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String("*.") + vital::kLfoExtension,
+  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String(vital::kLfoExtensionsList),
                                            "", getCurrentFile(), -1);
   if (lfo_file.exists())
     loadFile(lfo_file);
@@ -1157,7 +1157,7 @@ void ModulationMatrix::prevClicked() {
 }
 
 void ModulationMatrix::nextClicked() {
-  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String("*.") + vital::kLfoExtension,
+  File lfo_file = LoadSave::getShiftedFile(LoadSave::kLfoFolderName, String(vital::kLfoExtensionsList),
                                            "", getCurrentFile(), 1);
   if (lfo_file.exists())
     loadFile(lfo_file);
@@ -1173,7 +1173,7 @@ void ModulationMatrix::textMouseDown(const MouseEvent& e) {
   int browser_height = kBrowserHeight * size_ratio_;
   Rectangle<int> bounds(preset_selector_->getRight(), preset_selector_->getY(), browser_width, browser_height);
   bounds = getLocalArea(this, bounds);
-  showPopupBrowser(this, bounds, LoadSave::getLfoDirectories(), String("*.") + vital::kLfoExtension,
+  showPopupBrowser(this, bounds, LoadSave::getLfoDirectories(), String(vital::kLfoExtensionsList),
                    LoadSave::kLfoFolderName, "");
 }
 
@@ -1190,7 +1190,7 @@ void ModulationMatrix::togglePaintMode(bool enabled, bool temporary_switch) {
 }
 
 void ModulationMatrix::importLfo() {
-  FileChooser import_box("Import LFO", LoadSave::getUserLfoDirectory(), String("*.") + vital::kLfoExtension);
+  FileChooser import_box("Import LFO", LoadSave::getUserLfoDirectory(), String(vital::kLfoExtensionsList));
   if (!import_box.browseForFileToOpen())
     return;
 

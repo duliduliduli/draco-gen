@@ -27,7 +27,7 @@
 #define STRINGIFY(x) QUOTE(x)
 
 namespace {
-  const std::string kLinuxUserDataDirectory = "~/.local/share/vital/";
+  const std::string kLinuxUserDataDirectory = "~/.local/share/dracogen/";
   const std::string kAvailablePacksFile = "available_packs.json";
   const std::string kInstalledPacksFile = "packs.json";
 
@@ -137,7 +137,7 @@ json LoadSave::stateToJson(SynthBase* synth, const CriticalSection& critical_sec
   settings_data["lfos"] = lfos;
 
   json data;
-  data["synth_version"] = ProjectInfo::versionString;
+  data["synth_version"] = vital::kFileFormatVersion;
   data["preset_name"] = synth->getPresetName().toStdString();
   data["author"] = synth->getAuthor().toStdString();
   data["comments"] = synth->getComments().toStdString();
@@ -1027,11 +1027,11 @@ json LoadSave::updateFromOldVersion(json state) {
 bool LoadSave::jsonToState(SynthBase* synth, std::map<std::string, String>& save_info, json data) {
   std::string version = data["synth_version"];
   
-  int compare_feature_versions = compareFeatureVersionStrings(version, ProjectInfo::versionString);
+  int compare_feature_versions = compareFeatureVersionStrings(version, String(vital::kFileFormatVersion));
   if (compare_feature_versions > 0)
     return false;
   
-  int compare_versions = compareVersionStrings(version, ProjectInfo::versionString);
+  int compare_versions = compareVersionStrings(version, String(vital::kFileFormatVersion));
   if (compare_versions < 0 || data["settings"].count("sub_octave"))
     data = updateFromOldVersion(data);
   
@@ -1129,14 +1129,14 @@ std::string LoadSave::getLicense(json data) {
 File LoadSave::getConfigFile() {
 #if defined(JUCE_DATA_STRUCTURES_H_INCLUDED)
   PropertiesFile::Options config_options;
-  config_options.applicationName = "Vial";
+  config_options.applicationName = "DracoGen";
   config_options.osxLibrarySubFolder = "Application Support";
   config_options.filenameSuffix = "config";
 
 #ifdef LINUX
-  config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
+  config_options.folderName = ".dracogen";
 #else
-  config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
+  config_options.folderName = "DracoGen";
 #endif
 
   return config_options.getDefaultFile();
@@ -1165,14 +1165,14 @@ void LoadSave::writeErrorLog(String error_log) {
 File LoadSave::getFavoritesFile() {
 #if defined(JUCE_DATA_STRUCTURES_H_INCLUDED)
   PropertiesFile::Options config_options;
-  config_options.applicationName = "Vial";
+  config_options.applicationName = "DracoGen";
   config_options.osxLibrarySubFolder = "Application Support";
   config_options.filenameSuffix = "favorites";
 
 #ifdef LINUX
-  config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
+  config_options.folderName = ".dracogen";
 #else
-  config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
+  config_options.folderName = "DracoGen";
 #endif
 
   return config_options.getDefaultFile();
@@ -1184,14 +1184,14 @@ File LoadSave::getFavoritesFile() {
 File LoadSave::getDefaultSkin() {
 #if defined(JUCE_DATA_STRUCTURES_H_INCLUDED)
   PropertiesFile::Options config_options;
-  config_options.applicationName = "Vial";
+  config_options.applicationName = "DracoGen";
   config_options.osxLibrarySubFolder = "Application Support";
   config_options.filenameSuffix = "skin";
 
 #ifdef LINUX
-  config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
+  config_options.folderName = ".dracogen";
 #else
-  config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
+  config_options.folderName = "DracoGen";
 #endif
 
   return config_options.getDefaultFile();
@@ -1290,7 +1290,7 @@ void LoadSave::savePreferredTTWTLanguage(std::string language) {
 void LoadSave::saveVersionConfig() {
   json data = getConfigJson();
 
-  data["synth_version"] = ProjectInfo::versionString;
+  data["synth_version"] = vital::kFileFormatVersion;
   saveJsonToConfig(data);
 }
 
@@ -1539,7 +1539,7 @@ bool LoadSave::wasUpgraded() {
     return true;
 
   std::string version = data["synth_version"];
-  return compareVersionStrings(version, ProjectInfo::versionString) < 0;
+  return compareVersionStrings(version, String(vital::kFileFormatVersion)) < 0;
 }
 
 bool LoadSave::isExpired() {
@@ -1571,7 +1571,7 @@ bool LoadSave::shouldCheckForUpdates() {
   json data = getConfigJson();
 
   if (!data.count("check_for_updates"))
-    return true;
+    return false;
 
   return data["check_for_updates"];
 }
@@ -1745,14 +1745,14 @@ File LoadSave::getDataDirectory() {
   String xdg_data_home = SystemStats::getEnvironmentVariable ("XDG_DATA_HOME", {});
 
   if (!xdg_data_home.trim().isEmpty())
-    directory = File(xdg_data_home).getChildFile("vial");
+    directory = File(xdg_data_home).getChildFile("dracogen");
 
 #elif defined(__APPLE__)
   File home_directory = File::getSpecialLocation(File::userHomeDirectory);
-  File directory = home_directory.getChildFile("Music").getChildFile("Vial");
+  File directory = home_directory.getChildFile("Music").getChildFile("Draco Gen");
 #else
   File documents_dir = File::getSpecialLocation(File::userDocumentsDirectory);
-  File directory = documents_dir.getChildFile("Vial");
+  File directory = documents_dir.getChildFile("Draco Gen");
 #endif
 
   return directory;
@@ -1849,7 +1849,7 @@ void LoadSave::getAllFilesOfTypeInDirectories(Array<File>& files, const String& 
 }
 
 void LoadSave::getAllPresets(Array<File>& presets) {
-  getAllFilesOfTypeInDirectories(presets, String("*.") + vital::kPresetExtension, getPresetDirectories());
+  getAllFilesOfTypeInDirectories(presets, String(vital::kPresetExtensionsList), getPresetDirectories());
 }
 
 void LoadSave::getAllWavetables(Array<File>& wavetables) {
@@ -1857,11 +1857,11 @@ void LoadSave::getAllWavetables(Array<File>& wavetables) {
 }
 
 void LoadSave::getAllSkins(Array<File>& skins) {
-  getAllFilesOfTypeInDirectories(skins, String("*.") + vital::kSkinExtension, getSkinDirectories());
+  getAllFilesOfTypeInDirectories(skins, String(vital::kSkinExtensionsList), getSkinDirectories());
 }
 
 void LoadSave::getAllLfos(Array<File>& lfos) {
-  getAllFilesOfTypeInDirectories(lfos, String("*.") + vital::kLfoExtension, getLfoDirectories());
+  getAllFilesOfTypeInDirectories(lfos, String(vital::kLfoExtensionsList), getLfoDirectories());
 }
 
 void LoadSave::getAllSamples(Array<File>& samples) {
@@ -1873,7 +1873,7 @@ void LoadSave::getAllUserPresets(Array<File>& presets) {
     getDataDirectory().getChildFile(kPresetFolderName),
     getUserPresetDirectory()
   };
-  getAllFilesOfTypeInDirectories(presets, String("*.") + vital::kPresetExtension, directories);
+  getAllFilesOfTypeInDirectories(presets, String(vital::kPresetExtensionsList), directories);
 }
 
 void LoadSave::getAllUserWavetables(Array<File>& wavetables) {
@@ -1889,7 +1889,7 @@ void LoadSave::getAllUserLfos(Array<File>& lfos) {
     getDataDirectory().getChildFile(kLfoFolderName),
     getUserLfoDirectory()
   };
-  getAllFilesOfTypeInDirectories(lfos, String("*.") + vital::kLfoExtension, directories);
+  getAllFilesOfTypeInDirectories(lfos, String(vital::kLfoExtensionsList), directories);
 }
 
 void LoadSave::getAllUserSamples(Array<File>& samples) {
