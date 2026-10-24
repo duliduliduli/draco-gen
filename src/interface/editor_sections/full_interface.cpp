@@ -71,10 +71,7 @@ FullInterface::FullInterface(SynthGuiData* synth_data) : SynthSection("full_inte
     addSubSection(synthesis_interface_.get());
   }
 
-  effects_interface_ = std::make_unique<EffectsInterface>(synth_data->mono_modulations);
-  addSubSection(effects_interface_.get());
-  effects_interface_->setVisible(false);
-  effects_interface_->addListener(this);
+  // Draco Gen v1 has no effects section, so effects_interface_ stays null.
 
   master_controls_interface_ = std::make_unique<MasterControlsInterface>(synth_data->mono_modulations,
                                                                          synth_data->poly_modulations,
@@ -178,7 +175,7 @@ FullInterface::FullInterface(SynthGuiData* synth_data) : SynthSection("full_inte
     synthesis_interface_->toFront(true);
 
   master_controls_interface_->toFront(true);
-  effects_interface_->toFront(true);
+
   modulation_interface_->toFront(true);
   extra_mod_section_->toFront(true);
   keyboard_interface_->toFront(true);
@@ -263,7 +260,7 @@ void FullInterface::paintBackground(Graphics& g) {
   g.fillAll(findColour(Skin::kBackground, true));
   paintChildrenShadows(g);
 
-  if (effects_interface_ == nullptr)
+  if (modulation_matrix_ == nullptr)
     return;
 
   int padding = getPadding();
@@ -397,7 +394,7 @@ void FullInterface::resized() {
   ScopedLock lock(open_gl_critical_section_);
   static constexpr int kTopHeight = 48;
 
-  if (effects_interface_ == nullptr)
+  if (modulation_matrix_ == nullptr)
     return;
 
   int left = 0;
@@ -451,7 +448,8 @@ void FullInterface::resized() {
 
   if (synthesis_interface_)
     synthesis_interface_->setBounds(main_bounds);
-  effects_interface_->setBounds(main_bounds.withRight(main_bounds.getRight() + voice_padding));
+  if (effects_interface_)
+    effects_interface_->setBounds(main_bounds.withRight(main_bounds.getRight() + voice_padding));
   modulation_matrix_->setBounds(main_bounds);
   int modulation_height = voice_height - knob_section_height - padding;
   modulation_interface_->setBounds(main_bounds.getRight() + voice_padding,
@@ -648,9 +646,9 @@ void FullInterface::tabSelected(int index) {
   if (synthesis_interface_)
     synthesis_interface_->setVisible(index == 0 && make_visible);
 
-  effects_interface_->setVisible(index == 1 && make_visible);
-  modulation_matrix_->setVisible(index == 2 && make_visible);
-  master_controls_interface_->setVisible(index == 3 && make_visible);
+  // Tabs: 0 voice, 1 matrix, 2 advanced.
+  modulation_matrix_->setVisible(index == 1 && make_visible);
+  master_controls_interface_->setVisible(index == 2 && make_visible);
   modulation_manager_->setModulationAmounts();
   modulation_manager_->resized();
   modulation_manager_->setVisibleMeterBounds();

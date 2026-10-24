@@ -55,23 +55,13 @@ namespace {
     { "sample_", "Sample" },
     { "filter_1_", "Filter 1", true },
     { "filter_2_", "Filter 2", true },
-    { "filter_fx_", "Filter FX", true },
     { "", "" },
     { "lfo_", "LFOs" },
     { "random_", "Randoms" },
     { "env_", "Envelopes" },
     { "modulation_", "Mod Matrix" },
-    { "", "" },
-    { "chorus_", "Chorus" },
-    { "compressor_", "Compressor" },
-    { "delay_", "Delay" },
-    { "distortion_", "Distortion" },
-    { "phaser_", "Phaser" },
-    { "flanger_", "Flanger" },
-    { "reverb_", "Reverb" },
-    { "delay_", "Delay" },
-    { "eq_", "Equalizer" },
   };
+
 
   PopupItems createSubMenuForParameterPrefix(const std::string& name, const String& prefix,
                                              const std::vector<String>& parameter_names, bool local) {
@@ -565,8 +555,10 @@ ModulationMatrix::ModulationMatrix(const vital::output_map& sources, const vital
   std::sort(source_strings_.begin(), source_strings_.end(), comparator);
 
   destination_strings_.push_back(kNoConnectionString);
-  for (const auto& destination : destinations)
-    destination_strings_.push_back(destination.first);
+  for (const auto& destination : destinations) {
+    if (!vital::isEffectParameter(destination.first))
+      destination_strings_.push_back(destination.first);
+  }
 
   std::sort(destination_strings_.begin(), destination_strings_.end(), comparator);
 

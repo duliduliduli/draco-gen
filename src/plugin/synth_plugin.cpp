@@ -25,7 +25,7 @@ SynthPlugin::SynthPlugin() {
   int num_params = vital::Parameters::getNumParameters();
   for (int i = 0; i < num_params; ++i) {
     const vital::ValueDetails* details = vital::Parameters::getDetails(i);
-    if (controls_.count(details->name) == 0)
+    if (controls_.count(details->name) == 0 || vital::isEffectParameter(details->name))
       continue;
 
     ValueBridge* bridge = new ValueBridge(details->name, controls_[details->name]);
