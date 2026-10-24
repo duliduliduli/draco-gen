@@ -24,6 +24,7 @@ namespace draco {
 
   namespace {
     constexpr int kMaxAttempts = 8;
+    constexpr float kMaxShortfallDb = 6.0f;
     constexpr float kTailSeconds = 0.15f;
 
     float toDb(double magnitude) {
@@ -149,19 +150,35 @@ namespace draco {
     std::vector<int> notes = testNotesForType(type);
     float target = targetRmsForConfig(generator.getConfig(type, genre));
 
+    // Try derived seeds until a patch is playable and reaches the target loudness
+    // within kMaxShortfallDb. If none does, keep the loudest playable attempt.
     PatchGenerator::Result result;
     Report current;
+    PatchGenerator::Result best_result;
+    Report best_report;
+    bool have_best = false;
     uint32_t attempt_seed = seed;
     for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
       result = generator.generate(type, genre, attempt_seed, base_state.is_null() ? init_state_ : base_state);
       current = audit(result.state, notes);
-      if (current.playable())
-        break;
       attempt_seed = attempt_seed * 1664525u + 1013904223u;
-    }
+      if (!current.playable())
+        continue;
 
-    if (current.playable())
       current = normalize(result.state, notes, target);
+      if (current.playable() && current.rms_db >= target - kMaxShortfallDb)
+        break;
+
+      if (current.playable() && (!have_best || current.rms_db > best_report.rms_db)) {
+        best_result = result;
+        best_report = current;
+        have_best = true;
+      }
+      if (attempt == kMaxAttempts - 1 && have_best) {
+        result = best_result;
+        current = best_report;
+      }
+    }
 
     if (report)
       *report = current;
