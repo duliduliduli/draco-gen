@@ -20,6 +20,7 @@
 #include "flanger_module.h"
 #include "phaser_module.h"
 #include "decimator.h"
+#include "output_limiter.h"
 #include "modulation_connection_processor.h"
 #include "synth_constants.h"
 #include "synth_voice_handler.h"
@@ -119,16 +120,20 @@ namespace vital {
     scaled_audio->plug(decoder, SmoothVolume::kAudioRate);
     scaled_audio->plug(volume, SmoothVolume::kDb);
 
+    OutputLimiter* limiter = new OutputLimiter();
+    limiter->plug(scaled_audio);
+
     peak_meter_ = new PeakMeter();
-    peak_meter_->plug(scaled_audio, 0);
+    peak_meter_->plug(limiter, 0);
     createStatusOutput("peak_meter", peak_meter_->output(PeakMeter::kLevel));
     createStatusOutput("peak_meter_memory", peak_meter_->output(PeakMeter::kMemoryPeak));
 
     Clamp* clamp = new Clamp(-2.1f, 2.1f);
-    clamp->plug(scaled_audio);
-    
-    addProcessor(peak_meter_);
+    clamp->plug(limiter);
+
     addProcessor(scaled_audio);
+    addProcessor(limiter);
+    addProcessor(peak_meter_);
 
     addProcessor(clamp);
     clamp->useOutput(output());

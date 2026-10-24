@@ -50,6 +50,7 @@
 #include "envelope.cpp"
 #include "smooth_value.cpp"
 #include "peak_meter.cpp"
+#include "output_limiter.cpp"
 #include "value_switch.cpp"
 #include "legato_filter.cpp"
 #include "portamento_slope.cpp"
