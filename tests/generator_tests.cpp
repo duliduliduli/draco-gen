@@ -209,7 +209,7 @@ int main() {
           auditor.generatePlayable(generator, type, genre, seed, json(), &report);
           check(report.playable(), type + "/" + genre + " seed " + std::to_string(seed) + " not playable");
           check(report.peak_db <= -0.9f, "peak above the limiter ceiling");
-          check(report.rms_db > -30.0f, "patch is too quiet");
+          check(report.rms_db > -22.0f, "patch is too quiet");
         }
       }
     }
