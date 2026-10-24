@@ -1,0 +1,485 @@
+{
+  "format": "draco-generator-config",
+  "version": 1,
+  "type": "Lead",
+  "genre": "Hybrid Trap",
+  "preset_style": "Lead",
+  "description": "Bright, playable leads for hybrid trap: glide leads, supersaw leads, plucky bell leads and soft flute-like leads with delayed vibrato.",
+  "tags": [],
+  "loudness": {
+    "target_rms_db": -16.0
+  },
+  "base": {
+    "voice": {
+      "polyphony": [
+        4,
+        8
+      ],
+      "legato": 0,
+      "glide_chance": 0.3,
+      "glide_s": [
+        0.02,
+        0.08
+      ],
+      "pitch_bend_range": 2,
+      "velocity_track": [
+        0.1,
+        0.4
+      ],
+      "volume_db": -6.0
+    },
+    "oscillators": {
+      "1": {
+        "wavetables": [
+          "warm_saw",
+          "stack_saw",
+          "dragon_saw",
+          "pwm_hollow",
+          "soft_lead"
+        ],
+        "level": [
+          0.65,
+          0.8
+        ],
+        "transpose": 0,
+        "unison_voices": [
+          1,
+          5
+        ],
+        "unison_detune_percent": [
+          8,
+          25
+        ],
+        "unison_blend": [
+          0.6,
+          0.9
+        ],
+        "stereo_spread": [
+          0.5,
+          1.0
+        ],
+        "wave_frame": [
+          0,
+          180
+        ],
+        "random_phase": 1.0,
+        "distortion": [
+          "None",
+          "None",
+          "Squeeze",
+          "Bend",
+          "Pulse"
+        ],
+        "distortion_amount": [
+          0.1,
+          0.4
+        ],
+        "spectral_morph": [
+          "None",
+          "None",
+          "Low Pass",
+          "Harmonic Stretch"
+        ],
+        "spectral_morph_amount": [
+          0.1,
+          0.4
+        ],
+        "destination": "Filter 1"
+      },
+      "2": {
+        "chance": 0.6,
+        "wavetables": [
+          "pwm_hollow",
+          "soft_lead",
+          "warm_saw",
+          "dragon_saw"
+        ],
+        "level": [
+          0.35,
+          0.55
+        ],
+        "transpose": [
+          0,
+          12
+        ],
+        "tune": [
+          -0.08,
+          0.08
+        ],
+        "unison_voices": [
+          1,
+          3
+        ],
+        "unison_detune_percent": [
+          6,
+          20
+        ],
+        "wave_frame": [
+          0,
+          200
+        ],
+        "distortion": "None",
+        "destination": "Filter 1"
+      }
+    },
+    "filters": {
+      "1": {
+        "model": [
+          "Analog",
+          "Ladder",
+          "Digital"
+        ],
+        "style": [
+          "12dB",
+          "24dB"
+        ],
+        "cutoff_hz": [
+          1500,
+          7000
+        ],
+        "resonance": [
+          0.1,
+          0.4
+        ],
+        "drive_db": [
+          0,
+          6
+        ],
+        "keytrack": [
+          0.3,
+          0.7
+        ]
+      }
+    },
+    "envelopes": {
+      "1": {
+        "attack_s": [
+          0.001,
+          0.02
+        ],
+        "decay_s": [
+          0.5,
+          2.0
+        ],
+        "sustain": [
+          0.6,
+          1.0
+        ],
+        "release_s": [
+          0.1,
+          0.5
+        ]
+      },
+      "2": {
+        "attack_s": 0.001,
+        "decay_s": [
+          0.2,
+          0.8
+        ],
+        "sustain": [
+          0.2,
+          0.6
+        ],
+        "release_s": [
+          0.1,
+          0.4
+        ]
+      }
+    },
+    "lfos": {
+      "1": {
+        "shape": "sine",
+        "rate_hz": [
+          4.5,
+          6.5
+        ],
+        "delay_s": [
+          0.15,
+          0.4
+        ],
+        "fade_s": [
+          0.2,
+          0.5
+        ],
+        "sync_type": "Trigger"
+      },
+      "2": {
+        "chance": 0.6,
+        "shape": [
+          "triangle",
+          "sine"
+        ],
+        "tempo": [
+          "1/1",
+          "2/1",
+          "1/2"
+        ],
+        "sync_type": "Sync"
+      }
+    },
+    "modulations": {
+      "env2_cutoff": {
+        "source": "env_2",
+        "destination": "filter_1_cutoff",
+        "amount": [
+          0.1,
+          0.3
+        ]
+      },
+      "vibrato_1": {
+        "source": "lfo_1",
+        "destination": "osc_1_tune",
+        "amount": [
+          0.03,
+          0.07
+        ],
+        "bipolar": 1
+      },
+      "vibrato_2": {
+        "source": "lfo_1",
+        "destination": "osc_2_tune",
+        "amount": [
+          0.03,
+          0.07
+        ],
+        "bipolar": 1
+      },
+      "lfo2_frame": {
+        "source": "lfo_2",
+        "destination": "osc_1_wave_frame",
+        "amount": [
+          0.1,
+          0.3
+        ]
+      },
+      "velocity_cutoff": {
+        "chance": 0.6,
+        "source": "velocity",
+        "destination": "filter_1_cutoff",
+        "amount": [
+          0.05,
+          0.2
+        ]
+      },
+      "macro1_cutoff": {
+        "source": "macro_control_1",
+        "destination": "filter_1_cutoff",
+        "amount": [
+          0.2,
+          0.4
+        ]
+      },
+      "macro2_frame": {
+        "source": "macro_control_2",
+        "destination": "osc_1_wave_frame",
+        "amount": [
+          0.3,
+          0.6
+        ]
+      },
+      "macro3_detune": {
+        "source": "macro_control_3",
+        "destination": "osc_1_unison_detune",
+        "amount": [
+          0.2,
+          0.4
+        ]
+      }
+    },
+    "macros": {
+      "1": {
+        "name": "BRIGHT"
+      },
+      "2": {
+        "name": "TIMBRE"
+      },
+      "3": {
+        "name": "WIDTH"
+      }
+    }
+  },
+  "variants": [
+    {
+      "name": "Glide Lead",
+      "weight": 3,
+      "tags": [
+        "mono",
+        "glide"
+      ],
+      "voice": {
+        "polyphony": 1,
+        "legato": 1,
+        "glide_chance": 1.0,
+        "glide_s": [
+          0.04,
+          0.12
+        ]
+      },
+      "oscillators": {
+        "1": {
+          "unison_voices": [
+            1,
+            3
+          ],
+          "wavetables": [
+            "warm_saw",
+            "dragon_saw",
+            "pwm_hollow",
+            "soft_lead"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Supersaw",
+      "weight": 2,
+      "tags": [
+        "wide",
+        "poly"
+      ],
+      "oscillators": {
+        "1": {
+          "wavetables": [
+            "stack_saw",
+            "warm_saw"
+          ],
+          "unison_voices": [
+            5,
+            9
+          ],
+          "unison_detune_percent": [
+            20,
+            40
+          ],
+          "level": [
+            0.6,
+            0.72
+          ]
+        },
+        "2": {
+          "chance": 0.8,
+          "transpose": 12,
+          "unison_voices": [
+            3,
+            7
+          ],
+          "unison_detune_percent": [
+            15,
+            35
+          ]
+        }
+      },
+      "filters": {
+        "1": {
+          "cutoff_hz": [
+            3000,
+            9000
+          ]
+        }
+      }
+    },
+    {
+      "name": "Bell",
+      "weight": 2,
+      "tags": [
+        "pluck",
+        "bell"
+      ],
+      "oscillators": {
+        "1": {
+          "wavetables": [
+            "fm_growl",
+            "soft_lead"
+          ],
+          "wave_frame": [
+            20,
+            90
+          ],
+          "unison_voices": [
+            1,
+            2
+          ]
+        },
+        "2": {
+          "chance": 0.8,
+          "wavetables": [
+            "sub_sine",
+            "soft_lead"
+          ],
+          "transpose": [
+            12,
+            24
+          ]
+        }
+      },
+      "envelopes": {
+        "1": {
+          "decay_s": [
+            0.4,
+            1.0
+          ],
+          "sustain": [
+            0.0,
+            0.25
+          ],
+          "release_s": [
+            0.3,
+            0.8
+          ]
+        }
+      },
+      "lfos": {
+        "1": {
+          "chance": 0.3
+        }
+      }
+    },
+    {
+      "name": "Flute",
+      "weight": 1,
+      "tags": [
+        "soft"
+      ],
+      "voice": {
+        "polyphony": 1,
+        "legato": 1,
+        "glide_chance": 0.7
+      },
+      "oscillators": {
+        "1": {
+          "wavetables": [
+            "soft_lead",
+            "pwm_hollow"
+          ],
+          "wave_frame": [
+            0,
+            80
+          ],
+          "unison_voices": 1
+        },
+        "2": {
+          "chance": 0.0
+        }
+      },
+      "filters": {
+        "1": {
+          "model": [
+            "Analog"
+          ],
+          "cutoff_hz": [
+            1200,
+            3500
+          ]
+        }
+      },
+      "envelopes": {
+        "1": {
+          "attack_s": [
+            0.02,
+            0.08
+          ]
+        }
+      }
+    }
+  ]
+}

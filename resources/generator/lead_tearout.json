@@ -1,0 +1,119 @@
+{
+  "format": "draco-generator-config",
+  "version": 1,
+  "type": "Lead",
+  "genre": "Tearout",
+  "preset_style": "Lead",
+  "description": "Screeching, yelling and siren leads with hard sync, formant and digital warps driven by fast tempo-synced LFOs.",
+  "tags": ["mono", "aggressive"],
+  "loudness": { "target_rms_db": -15.0 },
+  "base": {
+    "voice": {
+      "polyphony": 1,
+      "legato": 1,
+      "glide_chance": 0.7,
+      "glide_s": [0.02, 0.08],
+      "pitch_bend_range": 12,
+      "velocity_track": [0.0, 0.2],
+      "volume_db": -6.0
+    },
+    "oscillators": {
+      "1": {
+        "wavetables": ["sync_screech", "harsh_digital", "vowel_growl", "fm_growl"],
+        "level": [0.7, 0.85],
+        "transpose": [0, 12],
+        "unison_voices": [1, 4],
+        "unison_detune_percent": [5, 20],
+        "wave_frame": [20, 160],
+        "random_phase": 0.0,
+        "distortion": ["Sync", "Formant", "Squeeze", "Bend", "Quantize"],
+        "distortion_amount": [0.45, 0.9],
+        "spectral_morph": ["None", "Formant Scale", "Harmonic Stretch", "Inharmonic Stretch"],
+        "spectral_morph_amount": [0.2, 0.6],
+        "destination": "Filter 1"
+      },
+      "2": {
+        "chance": 0.5,
+        "wavetables": ["sync_screech", "stack_saw", "fold_sine"],
+        "level": [0.35, 0.55],
+        "transpose": [0, 12],
+        "unison_voices": [1, 3],
+        "unison_detune_percent": [6, 20],
+        "distortion": ["Sync", "Squeeze"],
+        "distortion_amount": [0.3, 0.7],
+        "destination": "Filter 1"
+      }
+    },
+    "filters": {
+      "1": {
+        "model": ["Comb", "Formant", "Diode", "Dirty", "Phaser"],
+        "style": ["12dB", "24dB"],
+        "cutoff_hz": [900, 5000],
+        "resonance": [0.25, 0.65],
+        "drive_db": [4, 12],
+        "keytrack": [0.4, 0.9],
+        "formant_x": [0.2, 0.8],
+        "formant_y": [0.2, 0.8]
+      }
+    },
+    "envelopes": {
+      "1": { "attack_s": [0.0005, 0.005], "decay_s": [0.5, 1.5], "sustain": [0.8, 1.0], "release_s": [0.05, 0.25] },
+      "2": { "attack_s": 0.001, "decay_s": [0.1, 0.5], "sustain": [0.0, 0.4], "release_s": 0.1 }
+    },
+    "lfos": {
+      "1": {
+        "shape": ["saw_down", "yoi", "stepped", "chop", "square", "wobble"],
+        "tempo": ["1/16", "1/8", "1/8T", "1/16T", "1/32"],
+        "sync_type": "Trigger"
+      },
+      "2": { "chance": 0.6, "shape": ["triangle", "sine"], "rate_hz": [4.0, 7.0], "delay_s": [0.1, 0.3] }
+    },
+    "modulations": {
+      "lfo1_frame": { "source": "lfo_1", "destination": "osc_1_wave_frame", "amount": [0.25, 0.6] },
+      "lfo1_warp": { "source": "lfo_1", "destination": "osc_1_distortion_amount", "amount": [0.15, 0.4] },
+      "lfo1_cutoff": { "chance": 0.6, "source": "lfo_1", "destination": "filter_1_cutoff", "amount": [0.08, 0.25] },
+      "lfo1_formant": { "chance": 0.5, "source": "lfo_1", "destination": "filter_1_formant_x", "amount": [0.2, 0.5] },
+      "env2_warp": { "chance": 0.5, "source": "env_2", "destination": "osc_1_distortion_amount", "amount": [0.1, 0.3] },
+      "vibrato": { "source": "lfo_2", "destination": "osc_1_tune", "amount": [0.03, 0.08], "bipolar": 1 },
+      "macro1_warp": { "source": "macro_control_1", "destination": "osc_1_distortion_amount", "amount": [0.2, 0.5] },
+      "macro2_cutoff": { "source": "macro_control_2", "destination": "filter_1_cutoff", "amount": [0.2, 0.4] },
+      "macro3_frame": { "source": "macro_control_3", "destination": "osc_1_wave_frame", "amount": [0.3, 0.6] },
+      "macro4_morph": { "source": "macro_control_4", "destination": "osc_1_spectral_morph_amount", "amount": [0.2, 0.5] }
+    },
+    "macros": {
+      "1": { "name": "WARP" },
+      "2": { "name": "CUTOFF" },
+      "3": { "name": "SCREECH" },
+      "4": { "name": "MORPH" }
+    }
+  },
+  "variants": [
+    {
+      "name": "Screech",
+      "weight": 3,
+      "tags": ["screech", "sync"],
+      "oscillators": { "1": { "wavetables": ["sync_screech"], "distortion": ["Sync", "Squeeze"] } }
+    },
+    {
+      "name": "Yell",
+      "weight": 2,
+      "tags": ["formant", "vocal"],
+      "oscillators": { "1": { "wavetables": ["vowel_growl", "fm_growl"], "distortion": ["Formant", "Bend"], "spectral_morph": ["Formant Scale", "None"] } },
+      "filters": { "1": { "model": ["Formant"], "resonance": [0.4, 0.8] } }
+    },
+    {
+      "name": "Digital",
+      "weight": 2,
+      "tags": ["digital"],
+      "oscillators": { "1": { "wavetables": ["harsh_digital", "stack_saw"], "distortion": ["Quantize", "Squeeze"], "unison_voices": [2, 5] } },
+      "filters": { "1": { "model": ["Comb", "Diode", "Dirty"] } }
+    },
+    {
+      "name": "Siren",
+      "weight": 1,
+      "tags": ["siren", "fx"],
+      "lfos": { "2": { "chance": 1.0, "shape": ["triangle", "saw_up"], "rate_hz": [2.0, 5.0], "delay_s": 0.0 } },
+      "modulations": { "vibrato": { "amount": [0.15, 0.4] } }
+    }
+  ]
+}

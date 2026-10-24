@@ -82,8 +82,24 @@ class SynthBase : public MidiManager::Listener {
     void initEngine();
     void loadTuningFile(const File& file);
     void loadInitPreset();
+    json saveToJson();
+    bool loadFromJson(const json& state);
     bool loadFromFile(File preset, std::string& error);
     void renderAudioToFile(File file, float seconds, float bpm, std::vector<int> notes, bool render_images);
+    // Renders the current patch offline into a stereo buffer: notes are held for
+    // note_seconds and the buffer keeps rendering the release until it is full.
+    void renderNotesToBuffer(AudioSampleBuffer& buffer, int sample_rate, float note_seconds, float bpm,
+                             const std::vector<int>& notes, float velocity = 0.7f);
+
+    struct RenderNote {
+      double start_seconds;
+      double length_seconds;
+      int note;
+      float velocity;
+    };
+    // Renders a note sequence offline into a stereo buffer (fills the whole buffer).
+    void renderSequenceToBuffer(AudioSampleBuffer& buffer, int sample_rate, float bpm,
+                                const std::vector<RenderNote>& notes);
     void renderAudioForResynthesis(float* data, int samples, int note);
     bool saveToFile(File preset);
     bool saveToActiveFile();
@@ -139,8 +155,6 @@ class SynthBase : public MidiManager::Listener {
     vital::modulation_change createModulationChange(vital::ModulationConnection* connection);
     bool isInvalidConnection(const vital::modulation_change& change);
     virtual SynthGuiInterface* getGuiInterface() = 0;
-    json saveToJson();
-    bool loadFromJson(const json& state);
     vital::ModulationConnection* getConnection(const std::string& source, const std::string& destination);
 
     inline bool getNextModulationChange(vital::modulation_change& change) {

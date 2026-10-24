@@ -209,3 +209,39 @@ if(DRACO_BUILD_RENDER)
     PUBLIC
       juce::juce_recommended_config_flags)
 endif()
+
+# ------------------------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------------------------
+if(DRACO_BUILD_TESTS)
+  juce_add_console_app(draco_tests
+    PRODUCT_NAME "draco_tests"
+    COMPANY_NAME "${DRACO_COMPANY_NAME}")
+
+  target_sources(draco_tests PRIVATE
+    src/unity_build/common.cpp
+    src/unity_build/synthesis.cpp
+    src/unity_build/generator.cpp
+    tests/generator_tests.cpp)
+
+  juce_generate_juce_header(draco_tests)
+  draco_configure_target(draco_tests)
+  target_compile_definitions(draco_tests PRIVATE HEADLESS=1)
+
+  target_link_libraries(draco_tests
+    PRIVATE
+      DracoBinaryData
+      juce::juce_audio_basics
+      juce::juce_audio_formats
+      juce::juce_core
+      juce::juce_data_structures
+      juce::juce_dsp
+      juce::juce_events
+    PUBLIC
+      juce::juce_recommended_config_flags)
+
+  add_test(NAME generator_tests COMMAND draco_tests)
+  if(DRACO_BUILD_RENDER)
+    add_test(NAME generator_audit COMMAND draco_render --audit --count 8)
+  endif()
+endif()

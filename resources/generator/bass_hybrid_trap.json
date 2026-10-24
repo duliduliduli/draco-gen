@@ -1,0 +1,160 @@
+{
+  "format": "draco-generator-config",
+  "version": 1,
+  "type": "Bass",
+  "genre": "Hybrid Trap",
+  "preset_style": "Bass",
+  "description": "808-style glide basses, wide reese basses and lighter growls for hybrid trap drops.",
+  "tags": ["mono"],
+  "loudness": { "target_rms_db": -13.0 },
+  "base": {
+    "voice": {
+      "polyphony": 1,
+      "legato": [0, 1],
+      "glide_chance": 0.7,
+      "glide_s": [0.03, 0.12],
+      "pitch_bend_range": 12,
+      "velocity_track": [0.0, 0.25],
+      "volume_db": -6.0
+    },
+    "oscillators": {
+      "1": {
+        "wavetables": ["fold_sine", "sub_sine"],
+        "level": [0.75, 0.9],
+        "transpose": -12,
+        "unison_voices": 1,
+        "wave_frame": [0, 60],
+        "random_phase": 0.0,
+        "phase": 0.25,
+        "distortion": ["None", "Squeeze"],
+        "distortion_amount": [0.1, 0.35],
+        "spectral_morph": "None",
+        "destination": "Filter 1"
+      },
+      "3": {
+        "chance": 0.5,
+        "wavetables": ["sub_sine"],
+        "level": [0.45, 0.6],
+        "transpose": -24,
+        "unison_voices": 1,
+        "random_phase": 0.0,
+        "phase": 0.25,
+        "destination": "Direct Out"
+      }
+    },
+    "filters": {
+      "1": {
+        "model": ["Analog", "Dirty"],
+        "style": ["12dB", "24dB"],
+        "cutoff_hz": [800, 3000],
+        "resonance": [0.05, 0.3],
+        "drive_db": [6, 14],
+        "keytrack": [0.0, 0.4]
+      }
+    },
+    "envelopes": {
+      "1": { "attack_s": [0.0005, 0.002], "decay_s": [0.8, 2.5], "sustain": [0.0, 0.4], "release_s": [0.2, 0.6] },
+      "2": { "attack_s": 0.0005, "decay_s": [0.03, 0.1], "sustain": 0.0, "release_s": 0.05 }
+    },
+    "modulations": {
+      "pitch_drop": { "chance": 0.8, "source": "env_2", "destination": "osc_1_transpose", "amount": [0.02, 0.06] },
+      "macro1_drive": { "source": "macro_control_1", "destination": "filter_1_drive", "amount": [0.3, 0.6] },
+      "macro2_cutoff": { "source": "macro_control_2", "destination": "filter_1_cutoff", "amount": [0.2, 0.4] },
+      "macro3_frame": { "source": "macro_control_3", "destination": "osc_1_wave_frame", "amount": [0.3, 0.6] },
+      "macro4_decay": { "source": "macro_control_4", "destination": "env_1_decay", "amount": [0.2, 0.4] }
+    },
+    "macros": {
+      "1": { "name": "DRIVE" },
+      "2": { "name": "CUTOFF" },
+      "3": { "name": "GRIT" },
+      "4": { "name": "DECAY" }
+    }
+  },
+  "variants": [
+    {
+      "name": "808",
+      "weight": 3,
+      "tags": ["808", "glide"]
+    },
+    {
+      "name": "Reese",
+      "weight": 2,
+      "tags": ["reese", "wide"],
+      "voice": { "glide_chance": 0.4 },
+      "oscillators": {
+        "1": {
+          "wavetables": ["stack_saw", "warm_saw"],
+          "unison_voices": [3, 6],
+          "unison_detune_percent": [15, 35],
+          "unison_blend": [0.7, 0.95],
+          "stereo_spread": [0.6, 1.0],
+          "wave_frame": [0, 200],
+          "random_phase": 1.0,
+          "distortion": ["None", "Squeeze"],
+          "level": [0.65, 0.8]
+        },
+        "2": {
+          "wavetables": ["warm_saw", "stack_saw"],
+          "level": [0.45, 0.6],
+          "transpose": -12,
+          "tune": [-0.15, 0.15],
+          "unison_voices": [2, 4],
+          "unison_detune_percent": [10, 30],
+          "destination": "Filter 1"
+        },
+        "3": { "chance": 1.0 }
+      },
+      "filters": {
+        "1": { "model": ["Ladder", "Analog"], "style": "24dB", "cutoff_hz": [400, 1500], "resonance": [0.1, 0.4], "drive_db": [2, 10] }
+      },
+      "envelopes": {
+        "1": { "decay_s": [0.5, 1.5], "sustain": [0.8, 1.0], "release_s": [0.08, 0.3] }
+      },
+      "lfos": {
+        "1": { "shape": ["sine", "triangle"], "tempo": ["1/2", "1/1", "1/4"], "sync_type": "Sync" }
+      },
+      "modulations": {
+        "pitch_drop": null,
+        "lfo1_cutoff": { "source": "lfo_1", "destination": "filter_1_cutoff", "amount": [0.05, 0.15] },
+        "lfo1_frame": { "source": "lfo_1", "destination": "osc_1_wave_frame", "amount": [0.2, 0.5] }
+      }
+    },
+    {
+      "name": "Grit Glide",
+      "weight": 2,
+      "tags": ["808", "distorted"],
+      "oscillators": {
+        "1": {
+          "wavetables": ["fold_sine", "fm_growl"],
+          "wave_frame": [30, 110],
+          "distortion": ["Squeeze", "Bend"],
+          "distortion_amount": [0.3, 0.6]
+        }
+      },
+      "filters": { "1": { "model": ["Dirty", "Diode"], "drive_db": [10, 18] } }
+    },
+    {
+      "name": "Wub",
+      "weight": 1,
+      "tags": ["wobble"],
+      "oscillators": {
+        "1": {
+          "wavetables": ["fm_growl", "dragon_saw"],
+          "unison_voices": [1, 2],
+          "distortion": ["Bend", "None"],
+          "distortion_amount": [0.2, 0.5],
+          "wave_frame": [0, 80]
+        },
+        "3": { "chance": 1.0 }
+      },
+      "envelopes": { "1": { "decay_s": [0.5, 1.5], "sustain": [0.8, 1.0], "release_s": [0.05, 0.2] } },
+      "filters": { "1": { "model": ["Ladder", "Dirty"], "cutoff_hz": [300, 1200], "resonance": [0.2, 0.5] } },
+      "lfos": { "1": { "shape": ["wobble", "sine", "yoi"], "tempo": ["1/4", "1/8", "1/4T"] } },
+      "modulations": {
+        "pitch_drop": null,
+        "lfo1_cutoff": { "source": "lfo_1", "destination": "filter_1_cutoff", "amount": [0.15, 0.35] },
+        "lfo1_frame": { "source": "lfo_1", "destination": "osc_1_wave_frame", "amount": [0.2, 0.5] }
+      }
+    }
+  ]
+}
