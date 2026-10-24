@@ -98,6 +98,12 @@ function(draco_configure_target target)
       __SSE2__=1)
     target_compile_options(${target} PRIVATE /bigobj /fp:fast /MP /wd4244 /wd4267 /wd4305)
   else()
+    # JUCE 6 predates Xcode 15's new linker; keep the classic one there.
+    if(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+       AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0
+       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0)
+      target_link_options(${target} PRIVATE -Wl,-ld_classic)
+    endif()
     target_compile_options(${target} PRIVATE -ffast-math -fvisibility=hidden -fvisibility-inlines-hidden
       -Wno-deprecated-declarations)
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND NOT APPLE)
