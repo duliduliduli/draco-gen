@@ -33,7 +33,14 @@ int main(int argc, char* argv[]) {
   AudioPluginFormatManager formats;
   formats.addDefaultFormats();
 
-  String path = File::getCurrentWorkingDirectory().getChildFile(argv[1]).getFullPathName();
+  File plugin_file = File::getCurrentWorkingDirectory().getChildFile(argv[1]);
+#if JUCE_WINDOWS
+  // JUCE 6 builds a VST3 bundle folder on Windows but its host only opens the
+  // module file inside it.
+  if (plugin_file.isDirectory() && plugin_file.hasFileExtension(".vst3"))
+    plugin_file = plugin_file.getChildFile("Contents").getChildFile("x86_64-win").getChildFile(plugin_file.getFileName());
+#endif
+  String path = plugin_file.getFullPathName();
   OwnedArray<PluginDescription> found;
   for (AudioPluginFormat* format : formats.getFormats())
     format->findAllTypesForFile(found, path);
